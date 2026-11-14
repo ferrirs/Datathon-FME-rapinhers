@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cangur Tutor</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #f6f4ef; --card: #ffffff; --ink: #1d2433; --soft: #5b6475; --line: #dcd8cf;
+    --accent: #c2410c; --accent-soft: #fdece2; --good: #15803d; --good-soft: #e6f4ea;
+    --bad: #b91c1c; --bad-soft: #fbe9e9; --blue: #1d4ed8; --blue-soft: #e8eefc;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; align-items: baseline; gap: 12px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--card); }
+  header h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; }
+  header h1 span { color: var(--accent); }
+  header #who { margin-left: auto; color: var(--soft); font-size: 15px; }
+  main { max-width: 1120px; margin: 24px auto; padding: 0 20px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  .hidden { display: none !important; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); margin: 0 0 12px; }
+  button { font: inherit; cursor: pointer; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 9px 16px; }
+  button:hover:not(:disabled) { border-color: var(--ink); }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  input, select { font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; width: 100%; }
+  label { display: block; font-size: 15px; color: var(--soft); margin: 14px 0 5px; }
+
+  #login { max-width: 440px; margin: 60px auto; }
+  #login p { color: var(--soft); margin-top: 0; }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .chip.plain { background: var(--blue-soft); color: var(--blue); }
+  #text { font-size: 19px; margin: 0 0 16px; white-space: pre-wrap; }
+  #image { max-width: 100%; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; }
+  #options { display: grid; gap: 10px; }
+  .option { display: flex; align-items: stretch; gap: 8px; }
+  .option .pick { flex: 1; display: flex; gap: 14px; align-items: center; text-align: left; padding: 12px 16px; font-size: 18px; }
+  .option .letter { font-weight: 700; width: 30px; height: 30px; border-radius: 50%; background: var(--bg); display: grid; place-items: center; flex: none; }
+  .option .drop { width: 44px; padding: 0; color: var(--soft); font-size: 15px; }
+  .option.discarded .pick { text-decoration: line-through; opacity: .45; }
+  .option.discarded .drop { background: var(--bg); color: var(--ink); }
+  .option.wrong .pick { background: var(--bad-soft); border-color: var(--bad); }
+  .option.right .pick { background: var(--good-soft); border-color: var(--good); }
+  .actions { display: flex; gap: 10px; margin-top: 18px; align-items: center; flex-wrap: wrap; }
+  .actions small { color: var(--soft); }
+  #feedback { margin-top: 16px; padding: 14px 16px; border-radius: 10px; border-left: 5px solid var(--line); background: var(--bg); }
+  #feedback.good { border-color: var(--good); background: var(--good-soft); }
+  #feedback.bad { border-color: var(--bad); background: var(--bad-soft); }
+  #feedback strong { display: block; }
+
+  #hints { margin-top: 18px; display: grid; gap: 10px; }
+  .hint { border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 10px; padding: 12px 16px; background: #fffdfa; }
+  .hint h3 { margin: 0 0 4px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+  .hint p { margin: 4px 0; }
+  .hint .quote { border-left: 3px solid var(--line); padding-left: 12px; color: var(--soft); margin: 8px 0; }
+  .hint em { color: var(--soft); }
+  .data { display: inline-block; background: var(--blue-soft); color: var(--blue); border-radius: 6px; padding: 0 7px; margin: 2px 3px 2px 0; font-weight: 600; }
+
+  .topic { margin-bottom: 11px; }
+  .topic .row { display: flex; justify-content: space-between; font-size: 14px; }
+  .topic .row span:last-child { color: var(--soft); }
+  .bar { height: 9px; border-radius: 5px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; margin-top: 3px; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  .topic.mastered .bar i { background: var(--good); }
+  .topic.new .bar i { background: var(--line); }
+  #stats { color: var(--soft); font-size: 14px; margin: 0 0 14px; }
+  .legend { color: var(--soft); font-size: 13px; margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
+  kbd { font: 12px ui-monospace, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>Cangur</span> Tutor</h1>
+  <div id="who"></div>
+</header>
+
+<section id="login" class="card">
+  <h2>Comença</h2>
+  <p>Practica problemes Cangur al teu ritme. Tot s'executa en aquesta placa: les teves respostes no surten d'aquí.</p>
+  <label for="name">El teu nom</label>
+  <input id="name" autocomplete="off" maxlength="40">
+  <label for="level">El teu curs</label>
+  <select id="level">
+    <option value="0">5è de primària</option><option value="1">6è de primària</option>
+    <option value="2" selected>1r d'ESO</option><option value="3">2n d'ESO</option>
+    <option value="4">3r d'ESO</option><option value="5">4t d'ESO</option>
+    <option value="6">1r de batxillerat</option><option value="7">2n de batxillerat</option>
+  </select>
+  <div class="actions"><button class="primary" id="go">Comença a practicar</button><small id="loginError"></small></div>
+</section>
+
+<main id="app" class="hidden">
+  <section class="card">
+    <div class="chips" id="chips"></div>
+    <p id="text"></p>
+    <img id="image" class="hidden" alt="Figura del problema">
+    <div id="options"></div>
+    <div id="feedback" class="hidden" role="status" aria-live="polite"></div>
+    <div class="actions">
+      <button id="hintButton">Dona'm una pista</button>
+      <button id="nextButton" class="primary hidden">Següent problema</button>
+      <small id="keys"><kbd>A</kbd>–<kbd>E</kbd> respon · <kbd>P</kbd> pista · <kbd>Enter</kbd> següent</small>
+    </div>
+    <div id="hints" aria-live="polite"></div>
+  </section>
+
+  <aside class="card">
+    <h2>El teu mapa de temes</h2>
+    <p id="stats"></p>
+    <div id="topics"></div>
+    <div class="legend">La barra es fa verda quan domines el tema. Un tema dominat torna de tant en tant, per repassar-lo.</div>
+  </aside>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const STATE = { new: "nou", learning: "aprenent", consolidating: "consolidant", mastered: "dominat" };
+let student = null, step = null, closed = false, polling = null;
+
+async function call(path, params) {
+  const query = new URLSearchParams(params).toString();
+  const response = await fetch("/api/" + path + (query ? "?" + query : ""));
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Hi ha hagut un error.");
+  return data;
+}
+
+function showProfile(profile) {
+  $("who").textContent = profile.name;
+  $("stats").textContent = profile.done
+    ? `${profile.done} problemes fets, ${profile.correct_first} encertats a la primera`
+    : "Encara no has fet cap problema.";
+  $("topics").innerHTML = profile.topics.map((t) => `
+    <div class="topic ${t.state}">
+      <div class="row"><span>${esc(t.name)}</span><span>${STATE[t.state]}${t.review_in != null ? ` · repàs d'aquí a ${t.review_in}` : ""}</span></div>
+      <div class="bar"><i style="width:${Math.round(100 * (t.state === "mastered" ? 1 : t.progress))}%"></i></div>
+    </div>`).join("");
+}
+
+function problemHtml(problem) {
+  const options = Object.entries(problem.options).map(([k, v]) => `${k}) ${esc(v)}`).join(" &nbsp; ");
+  return `<div class="quote">${esc(problem.text)}${options ? "<br>" + options : ""}</div>`;
+}
+
+function showStep(data) {
+  step = data; closed = false;
+  clearInterval(polling);
+  const chips = [`<span class="chip">${esc(data.topic.name)}</span>`];
+  if (data.is_review) chips.push('<span class="chip plain">Repàs</span>');
+  if (data.is_repair) chips.push('<span class="chip plain">Un de semblant, més fàcil</span>');
+  $("chips").innerHTML = chips.join("");
+  $("text").textContent = data.problem.text;
+  $("image").classList.toggle("hidden", !data.problem.image);
+  if (data.problem.image) $("image").src = data.problem.image;
+  const values = data.problem.options;
+  $("options").innerHTML = "ABCDE".split("").map((letter) => `
+    <div class="option" data-letter="${letter}">
+      <button class="pick"><span class="letter">${letter}</span><span>${esc(values[letter] ?? "")}</span></button>
+      <button class="drop" title="Descarta aquesta opció" aria-label="Descarta l'opció ${letter}">✕</button>
+    </div>`).join("");
+  for (const row of $("options").children) {
+    row.querySelector(".pick").onclick = () => answer(row.dataset.letter);
+    row.querySelector(".drop").onclick = () => discard(row.dataset.letter);
+  }
+  markDiscarded(data.discarded || []);
+  if (data.first_answer) markWrong(data.first_answer);
+  $("hints").innerHTML = "";
+  $("feedback").className = "hidden";
+  $("nextButton").classList.add("hidden");
+  $("hintButton").classList.remove("hidden");
+  $("hintButton").disabled = false;
+  hintLabel(data.rung);
+}
+
+function hintLabel(rung) {
+  const left = step.max_rung - rung;
+  $("hintButton").textContent = rung === 0 ? "Dona'm una pista" : left > 1 ? "Una altra pista" : "Ensenya'm la resposta";
+}
+function row(letter) { return $("options").querySelector(`[data-letter="${letter}"]`); }
+function markDiscarded(letters) {
+  for (const r of $("options").children) r.classList.toggle("discarded", letters.includes(r.dataset.letter));
+}
+function markWrong(letter) { row(letter).classList.add("wrong"); row(letter).querySelector(".pick").disabled = true; }
+function feedback(kind, title, body) {
+  $("feedback").className = kind;
+  $("feedback").innerHTML = `<strong>${esc(title)}</strong>${body || ""}`;
+}
+
+async function next() {
+  try { showStep(await call("next", { student })); }
+  catch (error) { feedback("", error.message); $("hintButton").classList.add("hidden"); }
+}
+
+async function discard(letter) {
+  if (closed) return;
+  try { markDiscarded((await call("discard", { attempt: step.attempt_id, letter })).discarded); }
+  catch (error) { feedback("", error.message); }
+}
+
+async function answer(letter) {
+  if (closed || row(letter).querySelector(".pick").disabled) return;
+  try {
+    const result = await call("answer", { attempt: step.attempt_id, letter });
+    if (result.retry) {
+      markWrong(letter);
+      feedback("bad", "Aquesta no és. Tens un segon intent.", `<span>${esc(result.diagnosis.message)}</span>`);
+    } else finish(result, letter);
+  } catch (error) { feedback("", error.message); }
+}
+
+function finish(result, letter) {
+  closed = true;
+  clearInterval(polling);
+  if (letter && !result.correct) row(letter).classList.add("wrong");
+  row(result.label).classList.add("right");
+  for (const r of $("options").children) for (const b of r.querySelectorAll("button")) b.disabled = true;
+  const notes = [];
+  const topic = result.topic;
+  if (topic.state === "mastered" && topic.state_before !== "mastered") notes.push(`Has dominat «${step.topic.name}». Tornarà més endavant, per repassar-lo.`);
+  if (topic.state !== "mastered" && topic.state_before === "mastered") notes.push(`«${step.topic.name}» torna a la pràctica: cal refrescar-lo.`);
+  if (result.discarded_correct) notes.push("Havies descartat l'opció correcta. Quan descartis, digues-te per què no pot ser.");
+  if (!result.correct) notes.push("El proper problema serà un de semblant, una mica més fàcil.");
+  const answerText = `La resposta és ${result.label}${result.value ? ": " + esc(result.value) : ""}.`;
+  if (result.correct_first) feedback("good", "Correcte!", `<span>${notes.join(" ")}</span>`);
+  else if (result.correct) feedback("good", "Ara sí.", `<span>${answerText} ${notes.join(" ")}</span>`);
+  else feedback("bad", "No és aquesta.", `<span>${answerText} ${notes.join(" ")}</span>`);
+  showProfile(result.profile);
+  $("hintButton").classList.add("hidden");
+  $("nextButton").classList.remove("hidden");
+  $("nextButton").focus();
+}
+
+function hintHtml(h) {
+  if (h.kind === "understand") return `<h3>Entén la pregunta</h3><p>Et demanen: <strong>${esc(h.question)}</strong></p>` +
+    (h.data.length ? `<p>Dades de l'enunciat: ${h.data.map((d) => `<span class="data">${esc(d)}</span>`).join("")}</p>` : "") +
+    "<p><em>Quines dades necessites i quines no?</em></p>";
+  if (h.kind === "strategy") return `<h3>Estratègia</h3><p><strong>${esc(h.title)}</strong></p><p>${esc(h.body)}</p><p><em>${esc(h.analogy)}</em></p>`;
+  if (h.kind === "solved_before") return `<h3>Un problema que ja has resolt</h3><p>Aquest el vas encertar a la primera:</p>${problemHtml(h.problem)}` +
+    `<p>Vas respondre <strong>${esc(h.label)}${h.value ? ": " + esc(h.value) : ""}</strong>. <em>En què s'assembla al d'ara? Pots fer servir la mateixa idea?</em></p>`;
+  if (h.kind === "easier_example") return `<h3>Un problema semblant, més fàcil</h3>${problemHtml(h.problem)}` +
+    `<p>La seva resposta és <strong>${esc(h.label)}${h.value ? ": " + esc(h.value) : ""}</strong>. <em>Com s'hi arriba? Fes el mateix camí amb el teu problema.</em></p>`;
+  if (h.kind === "discard") return "<h3>Descarta</h3><p>Marca amb ✕ una opció que segur que no pot ser, i digues-te per què. Després tria entre les que queden.</p>";
+  if (h.kind === "model") return h.text
+    ? `<h3>Pista del copilot</h3><p>${esc(h.text)}</p>`
+    : "<h3>Pista del copilot</h3><p><em>El copilot no ha trobat una pista prou segura per a aquest problema. Demana'n una altra.</em></p>";
+  if (h.kind === "answer") return `<h3>Resposta</h3><p>La resposta és <strong>${esc(h.label)}${h.value ? ": " + esc(h.value) : ""}</strong>.</p>` +
+    (h.example ? `<p>Un de semblant i més fàcil, per entendre-ho:</p>${problemHtml(h.example.problem)}<p>Resposta: <strong>${esc(h.example.label)}${h.example.value ? ": " + esc(h.example.value) : ""}</strong></p>` : "");
+  return "";
+}
+
+function addHint(html) {
+  const box = document.createElement("div");
+  box.className = "hint"; box.innerHTML = html;
+  $("hints").append(box);
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  return box;
+}
+
+async function hint() {
+  if (closed || $("hintButton").disabled) return;
+  $("hintButton").disabled = true;
+  try {
+    const h = await call("hint", { attempt: step.attempt_id });
+    if (h.busy) {
+      const box = addHint("<h3>Pista del copilot</h3><p><em>El copilot està escrivint una pista. Triga uns segons…</em></p>");
+      polling = setInterval(async () => {
+        const s = await call("status", { attempt: step.attempt_id });
+        if (s.busy) return;
+        clearInterval(polling);
+        box.innerHTML = hintHtml(s);
+        $("hintButton").disabled = false;
+      }, 1000);
+    } else {
+      addHint(hintHtml(h));
+      if (h.kind === "answer") return finish(h.result, null);
+      $("hintButton").disabled = false;
+    }
+    if (h.rung) hintLabel(h.rung);
+  } catch (error) { feedback("", error.message); $("hintButton").disabled = false; }
+}
+
+async function start() {
+  try {
+    const profile = await call("start", { name: $("name").value, level: $("level").value });
+    student = profile.student_id;
+    $("login").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    showProfile(profile);
+    next();
+  } catch (error) { $("loginError").textContent = error.message; }
+}
+
+$("go").onclick = start;
+$("name").onkeydown = (e) => { if (e.key === "Enter") start(); };
+$("hintButton").onclick = hint;
+$("nextButton").onclick = next;
+document.addEventListener("keydown", (e) => {
+  if (!student || e.target.tagName === "INPUT" || e.ctrlKey || e.metaKey || e.altKey) return;
+  const key = e.key.toUpperCase();
+  if ("ABCDE".includes(key) && key.length === 1) answer(key);
+  else if (key === "P") hint();
+  else if (key === "ENTER" && closed) { e.preventDefault(); next(); }
+});
+$("name").focus();
+</script>
+</body>
+</html>

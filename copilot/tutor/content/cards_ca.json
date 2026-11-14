@@ -1,0 +1,82 @@
+{
+  "arithmetic": [
+    {"title": "Ordena les dades abans de calcular",
+     "body": "Escriu en una llista què saps i què et demanen. Decideix quina operació lliga cada dada amb la següent abans de fer cap compte.",
+     "analogy": "És com fer la compra: primer mires què tens a la nevera i què diu la recepta, i després decideixes què compres."},
+    {"title": "Fes una estimació",
+     "body": "Arrodoneix els nombres i calcula mentalment un resultat aproximat. Les opcions que queden molt lluny de l'estimació les pots deixar de banda.",
+     "analogy": "Si tres entrepans valen uns 4 € cadascun, saps que pagaràs al voltant de 12 € encara que no hagis fet el compte exacte."}
+  ],
+  "numbers": [
+    {"title": "Prova amb casos petits",
+     "body": "Abans de buscar el nombre gran, comprova la propietat amb nombres petits que puguis escriure. Sovint el patró es veu de seguida.",
+     "analogy": "Per saber si una clau obre tots els armaris, primer proves els dos que tens davant."},
+    {"title": "Mira l'última xifra i la paritat",
+     "body": "Pregunta't si el resultat ha de ser parell o senar, i en quina xifra ha d'acabar. Amb això ja pots descartar opcions.",
+     "analogy": "Si reparteixes cartes entre dos jugadors i no en sobra cap, el total de cartes segur que era parell."}
+  ],
+  "fractions": [
+    {"title": "Dibuixa el total com una barra",
+     "body": "Fes un rectangle que representi el total i parteix-lo en parts iguals. Marca les parts de què parla l'enunciat i mira què queda.",
+     "analogy": "Una rajola de xocolata de 12 quadrets: un terç són 4 quadrets, i el que queda són 8."},
+    {"title": "Posa un total que et vagi bé",
+     "body": "Si l'enunciat no diu quants n'hi ha, tria un total fàcil de dividir (12, 60, 100) i fes els càlculs amb aquest nombre.",
+     "analogy": "Per parlar de percentatges de la classe, imagina que sou 100: el 30 % són 30 persones."}
+  ],
+  "algebra": [
+    {"title": "Posa nom al que no saps",
+     "body": "Tria una lletra per a la quantitat desconeguda i tradueix cada frase de l'enunciat a una igualtat amb aquesta lletra.",
+     "analogy": "Una balança en equilibri: el que hi ha a un plat pesa igual que el que hi ha a l'altre, encara que una capsa estigui tancada."},
+    {"title": "Comença pel final",
+     "body": "Si saps el resultat i les operacions que s'han fet, desfés-les en ordre invers fins a arribar al nombre inicial.",
+     "analogy": "Per tornar a casa pel mateix camí, fas els girs al revés i en ordre contrari."}
+  ],
+  "patterns": [
+    {"title": "Escriu els primers termes en una taula",
+     "body": "Numera les posicions (1, 2, 3...) i escriu a sota el valor de cadascuna. Mira què canvia d'una posició a la següent.",
+     "analogy": "Les graderies d'un estadi: si cada fila té dos seients més que l'anterior, no cal comptar-les totes per saber la fila 20."},
+    {"title": "Busca el bloc que es repeteix",
+     "body": "Troba quants elements té el bloc que es repeteix i divideix la posició que et demanen per aquest nombre. El residu et diu on caus dins del bloc.",
+     "analogy": "Els dies de la setmana es repeteixen cada 7: d'aquí a 15 dies serà el mateix dia que d'aquí a 1."}
+  ],
+  "plane_geometry": [
+    {"title": "Fes el dibuix i posa-hi les mides",
+     "body": "Dibuixa la figura, encara que sigui a mà alçada, i escriu-hi totes les longituds i angles que dona l'enunciat. Després mira quins en pots deduir.",
+     "analogy": "Un plànol d'un pis: fins que no hi escrius les mides de cada paret, no pots saber si hi cap el sofà."},
+    {"title": "Parteix la figura en peces conegudes",
+     "body": "Descompon la figura en rectangles i triangles, o completa-la fins a un rectangle gran i resta el que sobra.",
+     "analogy": "Per saber quanta gespa cal en un jardí en forma de L, el parteixes en dos rectangles i sumes."}
+  ],
+  "solid_geometry": [
+    {"title": "Compta per capes",
+     "body": "Separa el cos en pisos o capes i compta què hi ha a cada una. Apunta el recompte de cada capa abans de sumar.",
+     "analogy": "Una caixa de fruita amb pisos: comptes les peces d'un pis i mires quants pisos hi ha."},
+    {"title": "Mira'l des de cada costat",
+     "body": "Imagina què veuries des de davant, des de dalt i des d'un costat. Pregunta't quines cares queden amagades i quines es toquen.",
+     "analogy": "Un dau sobre la taula: en veus com a molt tres cares, però en té sis, i la de sota també compta."}
+  ],
+  "counting": [
+    {"title": "Fes una llista ordenada",
+     "body": "Escriu els casos seguint un ordre fix (per exemple, de petit a gran) perquè no te'n deixis cap ni en repeteixis cap.",
+     "analogy": "Per no oblidar cap convidat, els apuntes per ordre alfabètic en lloc d'anar-los recordant a l'atzar."},
+    {"title": "Compta decisió per decisió",
+     "body": "Separa el problema en tries successives. Si la primera es pot fer de 3 maneres i la segona de 4, en total n'hi ha 3 × 4.",
+     "analogy": "Amb 3 samarretes i 4 pantalons, cada samarreta es pot combinar amb els 4 pantalons: 12 conjunts."}
+  ],
+  "logic": [
+    {"title": "Suposa un cas i busca la contradicció",
+     "body": "Tria una possibilitat, dona-la per certa i mira si totes les frases de l'enunciat encaixen. Si alguna no encaixa, aquella possibilitat queda descartada.",
+     "analogy": "Un detectiu que suposa que el culpable és el majordom i comprova si les coartades quadren."},
+    {"title": "Fes una taula de possibilitats",
+     "body": "Posa les persones en files i les opcions en columnes. Ratlla les caselles impossibles amb cada pista fins que només en quedi una per fila.",
+     "analogy": "Com el joc del Qui és qui: cada resposta fa abaixar unes quantes cares."}
+  ],
+  "measure": [
+    {"title": "Passa-ho tot a la mateixa unitat",
+     "body": "Abans de calcular, converteix totes les quantitats a una sola unitat (tot en minuts, tot en centímetres). Al final, torna a la unitat que et demanen.",
+     "analogy": "No pots sumar 2 hores i 30 minuts com 2 + 30: primer has de dir que són 120 minuts i 30 minuts."},
+    {"title": "Dibuixa una línia del temps",
+     "body": "Marca sobre una línia l'inici, el final i cada cosa que passa entremig, amb la seva durada. Així veus quins trams has de sumar o restar.",
+     "analogy": "L'horari d'un tren: sortida, parades i arribada, tot sobre la mateixa línia."}
+  ]
+}
