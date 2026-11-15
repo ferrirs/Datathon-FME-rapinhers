@@ -6,7 +6,7 @@ Nothing flashes: a tick or a cross stays for a moment, then the profile comes ba
 ROWS, COLS = 8, 13
 ON, DIM = 7, 2
 
-TICK = ["............ ",
+TICK = [".............",
         "...........#.",
         "..........#..",
         ".........#...",
@@ -30,6 +30,16 @@ WAIT = [".............",
         "......#......",
         ".............",
         "......#......"]
+
+
+KANGAROO = ["........#.#..",
+            "........###..",
+            "........####.",
+            ".......###...",
+            "......####.#.",
+            "#....#####...",
+            ".########....",
+            "......#####.."]
 
 
 def blank():
@@ -73,3 +83,8 @@ def cross():
 
 def wait():
     return from_art(WAIT, level=4)
+
+
+def idle():
+    """A kangaroo, while nobody is practising."""
+    return from_art(KANGAROO, level=5)

@@ -73,7 +73,7 @@ def main():
     answers_after = Counter(debias.debiased(scores, bias) for scores, _letter, _label in rows)
     with open(args.out, "w") as f:
         json.dump({"bias": bias, "problems": used, "languages": sorted(languages)}, f, indent=2)
-    print(f"Bias per letter: " + ", ".join(f"{k} {v:+.2f}" for k, v in bias.items()))
+    print("Bias per letter: " + ", ".join(f"{k} {v:+.2f}" for k, v in bias.items()))
     print(f"Answers before: {dict(sorted(answers_before.items()))}")
     print(f"Answers after:  {dict(sorted(answers_after.items()))}")
     print(f"On these {used} training problems: {before} right before, {after} right after (fitted on them: optimistic)")

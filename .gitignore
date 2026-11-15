@@ -1,4 +1,5 @@
 # Data from M3Kang is for research use only: never commit it
+*.zip
 data/*
 !data/sample_problems.jsonl
 !data/README.md

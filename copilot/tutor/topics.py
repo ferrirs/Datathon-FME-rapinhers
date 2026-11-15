@@ -34,6 +34,13 @@ def load_cards():
         return json.load(f)
 
 
+def load_analogies():
+    """{topic name: analogy}. For the team's topics of data/temes.json, matched by their exact name:
+    rename a topic there, and its analogy is simply not shown."""
+    with open(os.path.join(HERE, "content", "analogies_ca.json"), encoding="utf-8") as f:
+        return json.load(f)
+
+
 def dot(a, b):
     return sum(x * y for x, y in zip(a, b))
 

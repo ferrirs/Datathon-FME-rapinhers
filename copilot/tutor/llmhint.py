@@ -12,15 +12,25 @@ Keep the problem first and the instruction last, or the cache is useless.
 import re
 import time
 
-from ..client import post
+from ..client import get, post
 from ..config import CONFIG
 from . import settings as S
 from .textutil import has_number, numbers_in, option_value, strip_numbering, words
 
-URL = f"http://127.0.0.1:{CONFIG['LLM_PORT']}/v1/chat/completions"
+BASE = f"http://{S.LLM_HOST}:{CONFIG['LLM_PORT']}"
+URL = BASE + "/v1/chat/completions"
 SYSTEM = ("You are a math tutor for school students. You give one short hint about how to "
           "start a problem. You never solve it and you never state the answer.")
 STATES_ANSWER = re.compile(r"\b(the answer is|answer:|la resposta (és|es)|resposta:|la respuesta es)\b", re.IGNORECASE)
+
+
+def reachable(timeout=2):
+    """Is the model server answering? From inside App Lab it usually isn't: see settings.py."""
+    try:
+        get(BASE + "/health", timeout=timeout)
+        return True
+    except (OSError, ValueError):
+        return False
 
 
 def _instruction():

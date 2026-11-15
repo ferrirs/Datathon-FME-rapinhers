@@ -10,6 +10,11 @@ SENTENCE_END = re.compile(r"(?<=[.?!])\s+")
 WORD = re.compile(r"[^\W\d_]{4,}", re.UNICODE)
 
 
+def clean_text(text):
+    """M3Kang texts keep the line breaks of the printed page: make it one flowing paragraph."""
+    return re.sub(r"\s+", " ", text or "").strip()
+
+
 def strip_numbering(text):
     """'13. For 3 days...' -> 'For 3 days...': the question number is not data."""
     return LEADING_NUMBER.sub("", text.strip(), count=1)
@@ -60,6 +65,14 @@ def words(text):
 def has_number(text, value):
     """Does the text contain this value as a number of its own? 12 is not in '120'."""
     return any(abs(v - value) < 1e-9 for v in numbers_in(text))
+
+
+def utf8_console():
+    """Print any character on a Windows console too, even without PYTHONUTF8=1."""
+    import sys
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 def hash_embed(text, dim=384):

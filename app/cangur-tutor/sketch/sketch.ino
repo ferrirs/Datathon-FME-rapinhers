@@ -1,5 +1,6 @@
-// Cangur matrix: draws the frame that python/main.py sends over the Bridge.
-// Everything shown is decided in Python (copilot/tutor/matrix.py).
+// Cangur Tutor: draws the frame that python/main.py sends over the Bridge.
+// Everything shown is decided in Python (copilot/tutor/matrix.py): one bar per
+// topic, a tick, a cross, or a question mark while the model writes a hint.
 #include <Arduino_RouterBridge.h>
 #include <Arduino_LED_Matrix.h>
 #include <vector>

@@ -30,6 +30,7 @@ from collections import Counter
 from copilot.tutor import engine
 from copilot.tutor import settings as S
 from copilot.tutor.service import Tutor, TutorError
+from copilot.tutor.textutil import utf8_console
 
 LEVEL = 2
 ZONE = (0.60, 0.85)
@@ -55,8 +56,8 @@ def true_ability(spec, topic, topics, n_done):
 
 
 def simulate(tutor, spec, problems, rng, writer):
-    topics = tutor.available
-    student = tutor.start(spec["name"], LEVEL)["student_id"]
+    started = tutor.start(spec["name"], LEVEL)
+    student, topics = started["student_id"], [t["topic"] for t in started["topics"]]
     served, in_zone, by_state = 0, 0, Counter()
     demoted_after = None
     for n in range(problems):
@@ -68,15 +69,22 @@ def simulate(tutor, spec, problems, rng, writer):
         row = tutor.db.execute("SELECT b, label FROM problems WHERE id = ?", (step["problem"]["id"],)).fetchone()
         state = tutor.db.execute("SELECT state FROM student_topic WHERE student_id = ? AND topic = ?",
                                  (student, topic)).fetchone()["state"]
-        truth = true_ability(spec, topic, topics, n) if topic in topics else engine.reference_b(LEVEL)
+        truth = true_ability(spec, topic, topics, n)
         p = engine.p_correct(truth, row["b"])
+        result = None
         if spec.get("hints") and p < 0.7:
-            # Leans on hints when the problem looks hard, and then usually gets there
+            # Leans on hints when the problem looks hard, and then usually gets there.
+            # On a problem with few rungs, the last hint may be the answer itself.
             for _ in range(3 if p < 0.5 else 1):
-                tutor.hint(step["attempt_id"])
+                hint = tutor.hint(step["attempt_id"])
+                if hint["kind"] == "answer":
+                    result = hint["result"]
+                    break
             p = max(p, 0.8)
         wrong = [x for x in "ABCDE" if x != row["label"]]
-        if rng.random() < p:
+        if result is not None:
+            pass
+        elif rng.random() < p:
             result = tutor.answer(step["attempt_id"], row["label"])
         else:
             first = rng.choice(wrong)
@@ -110,6 +118,7 @@ def simulate(tutor, spec, problems, rng, writer):
 
 
 def main():
+    utf8_console()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--db", default=S.DB_PATH)
     p.add_argument("--problems", type=int, default=150, help="problems per simulated student")

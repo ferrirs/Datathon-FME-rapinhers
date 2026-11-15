@@ -1,0 +1,220 @@
+/* Cangur Tutor. A school notebook on the desk, and the board's LED matrix next to it.
+   No font, script or image comes from the internet: the board serves everything. */
+
+@font-face { font-family: "Shantell Sans"; font-weight: 600; font-display: swap;
+  src: url("fonts/shantell-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Shantell Sans"; font-weight: 700; font-display: swap;
+  src: url("fonts/shantell-sans-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-weight: 400; font-display: swap;
+  src: url("fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-weight: 400; font-style: italic; font-display: swap;
+  src: url("fonts/atkinson-hyperlegible-next-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-weight: 700; font-display: swap;
+  src: url("fonts/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2"); }
+
+:root {
+  --desk: #e6edf7;        /* squared paper under everything */
+  --grid: #cfdbee;
+  --paper: #ffffff;
+  --ink: #161a2b;
+  --soft: #55607a;
+  --pen: #1d3fa6;         /* blue ballpoint: headings, the student's marks */
+  --pen-wash: #e9eefb;
+  --marker: #ffe566;      /* highlighter: the data of the problem */
+  --right: #17804f;
+  --wrong: #d2263a;       /* the teacher's red pen */
+  --margin: #f0a3ab;      /* the margin line of the notebook */
+  --board: #0f1422;
+  --led: #63b6ff;
+  --led-off: #222c47;
+  --hand: "Shantell Sans", "Comic Sans MS", cursive;
+  --text: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0; min-height: 100vh; color: var(--ink);
+  font: 400 18px/1.55 var(--text);
+  background-color: var(--desk);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+/* --- Top bar --------------------------------------------------------------- */
+.bar { display: flex; align-items: center; gap: 16px; max-width: 1360px; margin: 0 auto; padding: 18px 24px 6px; }
+.brand { font: 700 24px/1 var(--hand); color: var(--pen); white-space: nowrap; }
+.who { margin-left: auto; color: var(--soft); font-size: 16px; }
+.bar .quiet { margin-left: 4px; }
+.who[hidden] + .quiet { margin-left: auto; }
+
+/* --- Shapes: paper has square corners, controls are round ------------------ */
+.sheet { background: var(--paper); border-radius: 5px; box-shadow: 0 0 0 1px #c7d3e6, 5px 6px 0 rgba(29, 63, 166, .12); }
+
+button { font: inherit; cursor: pointer; color: inherit; }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+
+.go { background: var(--pen); color: #fff; border: 0; border-radius: 999px; padding: 12px 28px; font: 700 20px/1.2 var(--hand); }
+.go:hover { background: #17327f; }
+.pill { background: var(--paper); border: 2px solid var(--pen); color: var(--pen); border-radius: 999px; padding: 9px 20px; font: 600 18px/1.2 var(--hand); }
+.pill:hover:not(:disabled) { background: var(--pen-wash); }
+.pill:disabled { opacity: .5; }
+.quiet { background: none; border: 0; color: var(--soft); text-decoration: underline; text-underline-offset: 3px; font-size: 16px; padding: 6px 4px; }
+.quiet:hover { color: var(--ink); }
+
+/* --- Welcome and summary --------------------------------------------------- */
+.welcome { max-width: 1360px; margin: 22px auto 0; padding: 0 24px; display: grid; grid-template-columns: minmax(0, 760px) 372px; gap: 28px; align-items: start; }
+.intro { padding: 44px 48px 40px 92px; position: relative; }
+.intro::before, .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: 62px; width: 2px; background: var(--margin); }
+.intro h1 { font: 700 clamp(34px, 5vw, 52px)/1.08 var(--hand); color: var(--pen); margin: 0 0 16px; max-width: 14ch; }
+.lead { font-size: 20px; max-width: 46ch; margin: 0 0 30px; }
+.field { display: block; font: 600 20px/1.3 var(--hand); color: var(--ink); margin: 0 0 8px; padding: 0; border: 0; }
+fieldset.field { margin-top: 26px; }
+fieldset.field legend { padding: 0; margin-bottom: 10px; }
+#name { font: 400 22px/1.3 var(--text); width: min(100%, 380px); padding: 8px 2px; border: 0; border-bottom: 2px solid var(--pen); border-radius: 0; background: transparent; color: var(--ink); }
+#name:focus { outline: 0; border-bottom-width: 4px; padding-bottom: 6px; }
+.courses { display: flex; flex-wrap: wrap; gap: 10px; }
+.courses input { position: absolute; opacity: 0; }
+.courses span { display: block; padding: 8px 18px; border: 2px solid var(--pen); border-radius: 999px; color: var(--pen); font: 600 18px/1.2 var(--hand); cursor: pointer; }
+.courses span:hover { background: var(--pen-wash); }
+.courses input:checked + span { background: var(--pen); color: #fff; }
+.courses input:focus-visible + span { outline: 3px solid var(--pen); outline-offset: 3px; }
+.intro .go { margin-top: 34px; }
+.intro .tools { margin-top: 0; }
+.intro .tools .go { margin: 0; }
+.problem-note { color: var(--wrong); min-height: 1.5em; margin: 12px 0 0; }
+.recap { list-style: none; padding: 0; margin: 0 0 30px; font-size: 19px; }
+.recap li { padding: 9px 0; border-bottom: 1px dashed var(--grid); }
+.recap b { font-family: var(--hand); color: var(--pen); }
+
+/* --- The board: a dark panel with the LED matrix --------------------------- */
+.board { background: var(--board); color: #c9d4ea; border-radius: 14px; padding: 22px 22px 18px; position: sticky; top: 18px; }
+.board p { margin: 16px 0 0; font-size: 16px; line-height: 1.45; }
+.board .small { color: #8492b3; font-size: 14.5px; }
+.leds { display: grid; grid-template-columns: repeat(13, 1fr); gap: 5px; padding: 12px; background: #090d18; border-radius: 8px; }
+.leds i { aspect-ratio: 1; border-radius: 50%; background: var(--led-off); transition: background-color .25s, box-shadow .25s; }
+.leds i[data-v="1"] { background: #2f4a78; }
+.leds i[data-v="2"], .leds i[data-v="3"] { background: #3f73b8; }
+.leds i[data-v="4"], .leds i[data-v="5"] { background: #56a1ea; box-shadow: 0 0 6px rgba(99, 182, 255, .45); }
+.leds i[data-v="6"], .leds i[data-v="7"] { background: var(--led); box-shadow: 0 0 9px rgba(99, 182, 255, .8); }
+.leds i.lit-topic { outline: 2px solid var(--marker); outline-offset: 1px; }
+@keyframes hop { 0%, 55%, 100% { transform: translateY(0); } 70%, 85% { transform: translateY(-9px); } }
+.leds.hop { animation: hop 1.6s steps(1) infinite; }
+.today { font: 600 17px/1.35 var(--hand); color: #fff; }
+.topics { list-style: none; margin: 14px 0 0; padding: 0; }
+.topics li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 8px; margin: 0 -8px; border-radius: 6px; font-size: 15.5px; line-height: 1.3; cursor: default; }
+.topics li:hover, .topics li.now { background: #1a2238; }
+.topics li.now .name { color: #fff; }
+.topics .state { color: #8492b3; white-space: nowrap; }
+.topics li.mastered .state { color: #7fe0ad; }
+.topics li.learning .state, .topics li.consolidating .state { color: var(--led); }
+
+/* --- The notebook page ----------------------------------------------------- */
+.practice { max-width: 1360px; margin: 22px auto 0; padding: 0 24px; display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 24px; align-items: start; }
+.page { position: relative; padding: 30px 44px 40px 92px; min-height: 480px; }
+.topic { margin: 0 0 18px; font: 600 21px/1.25 var(--hand); color: var(--pen); }
+.tag { font: 400 15.5px/1 var(--text); color: var(--soft); margin-left: 12px; }
+.statement { font-size: 21px; line-height: 1.6; margin: 0 0 6px; max-width: 62ch; text-wrap: pretty; }
+.statement mark { background: linear-gradient(transparent 12%, var(--marker) 12%, var(--marker) 88%, transparent 88%); color: inherit; padding: 0 3px; border-radius: 2px; }
+.statement u { text-decoration: underline; text-decoration-color: var(--pen); text-decoration-thickness: 3px; text-underline-offset: 5px; }
+/* A problem with a figure is shown as it was printed: a photocopy pasted across the page */
+.page.scanned { padding-top: 22px; }
+.scan { display: block; width: calc(100% + 136px); max-width: none; height: auto; margin: 0 -44px 6px -92px; position: relative;
+  background: #fff; border-top: 1px solid #dde5f1; border-bottom: 1px solid #dde5f1; cursor: zoom-in; }
+.zoom { position: fixed; inset: 0; z-index: 10; background: rgba(15, 20, 34, .82); display: grid; place-items: center; padding: 2vw; cursor: zoom-out; overflow: auto; }
+.zoom img { max-width: 100%; background: #fff; border-radius: 4px; }
+.original { margin: 2px 0 0; font-size: 15.5px; color: var(--soft); }
+.original summary { cursor: pointer; width: fit-content; text-decoration: underline; text-underline-offset: 3px; }
+.original img { display: block; width: 100%; margin-top: 10px; border: 1px solid var(--grid); }
+
+/* Answers: the bubbles of the Cangur answer sheet. Each one has a small cross to rule it out. */
+.options { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 26px 0 8px; }
+.options.long { grid-template-columns: 1fr; }
+.option { position: relative; display: flex; align-items: center; gap: 2px; min-width: 0; }
+.pick { display: flex; align-items: center; gap: 12px; text-align: left; background: none; border: 0; padding: 5px 6px 5px 3px; border-radius: 999px; font-size: 20px; line-height: 1.3; min-width: 0; }
+.pick .letter { flex: none; width: 46px; height: 46px; border-radius: 50%; border: 2.5px solid var(--pen); color: var(--pen); display: grid; place-items: center; font: 700 22px/1 var(--hand); background: var(--paper); }
+.pick .value { overflow-wrap: anywhere; }
+.pick:hover:not(:disabled) .letter { background: var(--pen-wash); }
+.pick:active:not(:disabled) .letter { background: var(--pen); color: #fff; }
+.strike { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; background: none; color: #a9b3c8; font-size: 15px; line-height: 1; }
+.strike:hover:not(:disabled) { color: var(--pen); background: var(--pen-wash); }
+.strike:disabled { visibility: hidden; }
+.options.nudge .strike:not(:disabled) { color: var(--pen); box-shadow: 0 0 0 2px var(--marker); }
+.options.letters .option { justify-content: center; }
+.option.struck .pick { opacity: .4; }
+.option.struck .pick::after { content: ""; position: absolute; left: 0; top: 50%; width: 58px; height: 3px; background: var(--pen); border-radius: 2px; transform: translateY(-50%) rotate(-38deg); transform-origin: 26px 50%; }
+.option.struck .strike { color: var(--pen); }
+.options.letters .option.struck .pick::after { left: calc(50% - 42px); }
+.option.wrong .letter { border-color: var(--wrong); color: var(--wrong); background: #fdecee; }
+.option.wrong .value { color: var(--wrong); text-decoration: line-through; }
+.option.wrong .pick { opacity: 1; }
+.option.right .letter { border-color: var(--right); background: var(--right); color: #fff; }
+.option.right .value { color: var(--right); font-weight: 700; }
+.option.right .pick { opacity: 1; }
+.option.right .pick::after { display: none; }
+
+/* The verdict: a tick or a cross drawn with the pen */
+.verdict { display: grid; grid-template-columns: 54px 1fr; gap: 6px 14px; align-items: center; margin: 20px 0 4px; }
+.verdict svg { width: 54px; height: 54px; fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.verdict svg path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw .45s ease-out forwards; }
+.verdict svg path + path { animation-delay: .25s; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.verdict.good svg { stroke: var(--right); }
+.verdict.bad svg { stroke: var(--wrong); }
+.verdict strong { display: block; font: 700 25px/1.15 var(--hand); }
+.verdict.good strong { color: var(--right); }
+.verdict.bad strong { color: var(--wrong); }
+.verdict p { margin: 4px 0 0; font-size: 18px; max-width: 58ch; }
+.verdict.plain { display: block; color: var(--wrong); }
+
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: 24px; }
+.tools .go { margin-left: auto; }
+
+/* Hints: notes written under the problem, one per rung of the ladder */
+.notes { list-style: none; margin: 30px 0 0; padding: 0; counter-reset: note; }
+.notes li { counter-increment: note; position: relative; padding: 16px 0 16px; border-top: 1px dashed #c3cfe3; }
+.notes li::before { content: counter(note); position: absolute; left: -68px; top: 14px; width: 30px; text-align: right; font: 700 22px/1.2 var(--hand); color: #d96a78; }
+.notes h3 { font: 600 20px/1.25 var(--hand); color: var(--pen); margin: 0 0 6px; }
+.notes p { margin: 6px 0; max-width: 60ch; }
+.notes .ask { color: var(--soft); font-style: italic; }
+.notes .chip { display: inline-block; background: var(--marker); border-radius: 3px; padding: 0 7px; margin: 0 4px 4px 0; font-weight: 700; }
+.other { border-left: 3px solid var(--pen); background: var(--pen-wash); padding: 12px 16px; margin: 10px 0; border-radius: 0 5px 5px 0; }
+.other p { margin: 0; }
+.other .choices { margin-top: 8px; color: var(--soft); }
+.other img { display: block; width: 100%; margin-top: 4px; mix-blend-mode: multiply; }
+.writing::after { content: "…"; animation: blink 1.2s steps(1) infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+
+.keys { max-width: 1360px; margin: 22px auto 0; padding: 0 24px 34px; color: var(--soft); font-size: 14.5px; }
+
+/* --- Small screens --------------------------------------------------------- */
+@media (max-width: 940px) {
+  .welcome, .practice { grid-template-columns: 1fr; }
+  .board { position: static; }
+  .board .leds { max-width: 360px; }
+}
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .bar, .welcome, .practice, .keys { padding-left: 12px; padding-right: 12px; }
+  .intro, .page { padding: 26px 18px 30px 40px; }
+  .intro::before, .page::before { left: 24px; }
+  .scan { width: calc(100% + 58px); margin: 0 -18px 6px -40px; }
+  .statement { font-size: 19px; }
+  .options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .options.letters { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .options.letters .option { flex-direction: column; gap: 0; }
+  .options.letters .pick .letter { width: 44px; height: 44px; }
+  .options.letters .option.struck .pick::after { left: calc(50% - 29px); top: 28px; }
+  .bar { gap: 10px; flex-wrap: wrap; }
+  .brand { font-size: 21px; }
+  .who, .bar .quiet { font-size: 14.5px; }
+  .notes li::before { left: -34px; width: 18px; font-size: 18px; }
+  .keys { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .leds.hop, .writing::after { animation: none; }
+  .verdict svg path { animation: none; stroke-dashoffset: 0; }
+  .leds i { transition: none; }
+}

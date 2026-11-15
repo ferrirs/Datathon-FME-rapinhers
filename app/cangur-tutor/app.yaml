@@ -1,0 +1,5 @@
+name: Cangur Tutor
+icon: 🦘
+description: Adaptive practice with Kangaroo problems (M3Kang), a hint ladder, and the student's topic map on the LED matrix. Runs offline on the board.
+bricks:
+  - arduino:web_ui

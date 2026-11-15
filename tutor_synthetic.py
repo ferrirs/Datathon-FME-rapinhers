@@ -3,8 +3,8 @@
 
     python3 tutor_synthetic.py                       # data/synthetic.jsonl, 480 problems
     python3 tutor_build.py all --input data/synthetic.jsonl --db data/tutor_synth.db \
-        --hand data/synthetic_labels.csv --fake-embed
-    python3 tutor_server.py --db data/tutor_synth.db --no-model
+        --hand data/synthetic_labels.csv --classifier --fake-embed
+    python3 tutor_server.py --db data/tutor_synth.db
 
 Ten templates, one per topic, in English and Catalan, at 8 levels. The wrong
 options come from typical mistakes, like Kangaroo distractors. The extra field

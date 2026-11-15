@@ -1,0 +1,8 @@
+The fonts in this folder are served by the board, so the page needs no internet.
+
+Shantell Sans: Copyright 2022 The Shantell Sans Project Authors (https://github.com/arrowtype/shantell-sans)
+Atkinson Hyperlegible Next: Copyright 2020-2024 The Atkinson Hyperlegible Next Project Authors
+(https://github.com/googlefonts/atkinson-hyperlegible-next)
+
+Both are licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org
+The files are the Latin subsets distributed by Fontsource (https://fontsource.org).

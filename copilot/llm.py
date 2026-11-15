@@ -1,4 +1,8 @@
 """Ask the small language model for one letter, A to E."""
+import os
+import re
+import time
+
 from .config import CONFIG
 from .client import post
 
@@ -38,15 +42,64 @@ def build_messages(problem, examples=(), image_b64=None):
     return messages
 
 
-def answer_letter(problem, examples=(), timeout=60, image_b64=None, url=URL):
-    """Return (letter, timings). The grammar makes any other output impossible."""
+def _setting(key, default):
+    """Environment first, then config.env, then the default."""
+    return os.environ.get(key, CONFIG.get(key, default))
+
+
+# Think first, then answer. REASON_TOKENS=0 turns it off (one letter straight away).
+REASON_TOKENS = int(_setting("REASON_TOKENS", "0"))
+# Generation cap. Reading the problem (~7 s) and the final letter come on top, so 20 s
+# keeps the worst case near 35 s, far from the 60 s limit. At 35 s we measured up to 54 s.
+REASON_SECONDS = float(_setting("REASON_SECONDS", "20"))
+
+REASON_PROMPT = ("Solve it step by step, briefly. Use only the facts in the problem. "
+                 "When you know the result, compare it with the options and finish with "
+                 "'Answer: <letter>'.")
+FINAL_PROMPT = "So the correct option is the letter:"
+
+
+def _letter(messages, timeout, url=URL):
     response = post(url, {
-        "messages": build_messages(problem, examples, image_b64),
+        "messages": messages,
         "grammar": "root ::= [A-E]",
         "max_tokens": 1,
         "temperature": 0,
         "seed": int(CONFIG["SEED"]),
         "cache_prompt": True,
     }, timeout=timeout)
-    letter = response["choices"][0]["message"]["content"].strip()
-    return letter, response.get("timings", {})
+    return response["choices"][0]["message"]["content"].strip(), response.get("timings", {})
+
+
+def answer_letter(problem, examples=(), timeout=60, image_b64=None, url=URL):
+    """Return (letter, timings). The grammar makes any other output impossible."""
+    messages = build_messages(problem, examples, image_b64)
+    if REASON_TOKENS <= 0 or timeout < REASON_SECONDS / 2:
+        return _letter(messages, timeout, url)
+
+    start = time.perf_counter()
+    question = messages[-1]["content"]
+    if isinstance(question, str):
+        question = question.removesuffix("\nAnswer:")
+        messages[-1] = {"role": "user", "content": question + "\n\n" + REASON_PROMPT}
+    try:
+        thought = post(url, {
+            "messages": messages,
+            "max_tokens": REASON_TOKENS,
+            "t_max_predict_ms": int(REASON_SECONDS * 1000),
+            "temperature": 0,
+            "seed": int(CONFIG["SEED"]),
+            "cache_prompt": True,
+            "chat_template_kwargs": {"enable_thinking": False},
+        }, timeout=min(timeout - 8, REASON_SECONDS + 10))
+        reasoning = (thought["choices"][0]["message"].get("content") or "").strip()
+    except Exception:  # too slow or the server hiccuped: answer without the reasoning
+        return _letter(build_messages(problem, examples, image_b64),
+                       max(timeout - (time.perf_counter() - start), 1.0), url)
+
+    stated = re.findall(r"Answer:\s*\(?([A-E])\b", reasoning)
+    if stated:
+        return stated[-1], thought.get("timings", {})
+    messages += [{"role": "assistant", "content": reasoning},
+                 {"role": "user", "content": FINAL_PROMPT}]
+    return _letter(messages, max(timeout - (time.perf_counter() - start), 1.0), url)
