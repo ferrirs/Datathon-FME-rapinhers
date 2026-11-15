@@ -1,4 +1,61 @@
-# Datathon FME 2026: Qualcomm challenge
+# Cangur Tutor: un entrenador del Cangur que corre sencer a l'Arduino UNO Q
+
+Datathon FME 2026, repte Qualcomm. Tot funciona **sense internet** a l'Arduino UNO Q (4 GB). Fem les dues parts del repte:
+
+- **Teach: Cangur Tutor.** Pràctica adaptativa de problemes del Cangur en català, per a alumnes de 5è de primària a 4t d'ESO (nivells 0–5 de M3Kang). L'alumne respon A–E en una pàgina web servida per la placa. La matriu LED 8×13 mostra el mapa de temes, i un vist o una creu després de cada resposta. Quan l'alumne s'encalla, rep una escala de pistes que no li dona mai la resposta directament. Detalls a [`docs/TUTOR.md`](docs/TUTOR.md).
+- **Reason: `predict.py`.** Respon cada problema amb una lletra A–E, en ≤ 60 s, a temperatura 0 i amb llavor 42. Primer el model raona pas a pas (fins a 250 tokens o 20 s), i després una gramàtica l'obliga a donar una sola lletra.
+
+> 📹 Vídeo de la demo: *pendent d'afegir*
+
+## Arquitectura
+
+| On | Què hi corre |
+| --- | --- |
+| Linux (Qualcomm QRB2210, 4 nuclis Arm) | `llama-server` amb Qwen3.5 0.8B Q8_0 (port 8081) i bge-small-en-v1.5 (port 8082). `predict.py`. L'app d'App Lab (`app/cangur-tutor/python/main.py`), que serveix la web al port 7000 amb SQLite (`data/tutor.db`). |
+| Microcontrolador (STM32) | `app/cangur-tutor/sketch/sketch.ino`: dibuixa la matriu LED, i rep les ordres pel Bridge. |
+
+L'app d'App Lab corre en un contenidor que no arriba als servidors dels models. Per això el tutor ho **precalcula** tot: el banc de problemes, els vectors, els veïns i les pistes de l'LLM (`tutor_build.py`, `tutor_hints.py`). Durant la sessió només fa servir SQLite i Python.
+
+**Com fem servir M3Kang:** com a banc de problemes (1.152 problemes de nivell ≤ 5, en català), com a mapa de dificultat (Elo per tema), com a pont multilingüe (calculem els embeddings sobre el text anglès del mateix `id` i l'alumne el veu en català), com a font de problemes semblants però més fàcils (veïns per embeddings), i com a font de diagnòstic d'errors (regles sobre els distractors numèrics).
+
+## Com replicar-ho
+
+1. Prepara la placa amb els passos 0 a 8 de la guia de l'organització, més avall: llama.cpp, models i serveis.
+2. Segueix [`INSTALL-PLACA.md`](INSTALL-PLACA.md): dades, tests (53), banc, alumne de demo i app d'App Lab.
+3. Per a la part Reason: `python3 predict.py --input problems.jsonl --output predictions.csv`. El raonament es configura a `config.env` amb `REASON_TOKENS` i `REASON_SECONDS`. Amb `REASON_TOKENS=0` es desactiva.
+
+Les dades de M3Kang **no són en aquest repositori**, perquè la seva llicència és només per a recerca. Les trobareu a la [dataset card](https://huggingface.co/datasets/qualcomm/M3Kang).
+
+## Resultats (Reason), mesurats a la placa
+
+| Experiment | Dades | n | Encert | Temps mitjà | Pitjor cas |
+| --- | --- | --- | --- | --- | --- |
+| Línia base: una lletra, sense raonar | M3Kang val | 50 | 22,0 % | 2,3 s | 3,6 s |
+| + RAG, 1 exemple | M3Kang val | 50 | 16,0 % | 4,6 s | 7,4 s |
+| Línia base | set de pràctica (eng) | 50 | 24,0 % | 7,2 s | 10,1 s |
+| Línia base | set de pràctica (eng), 20 primers | 20 | 40,0 % | — | — |
+| **Raonament, 250 tokens / 20 s** | set de pràctica (eng), els mateixos 20 | 20 | **45,0 %** | 41,3 s | 46,6 s |
+
+Respondre a l'atzar dona un 20 %. Amb n = 20, la millora del raonament (+1 problema) **no és estadísticament significativa**. El model tendeix a respondre D (13 de 20 vegades). Cap problema ha passat dels 60 s.
+
+**Anàlisi d'errors per tema, idioma i dificultat:** *pendent.* Els CSV de `results/` (que no es pugen) tenen el nivell, l'idioma i el resultat de cada problema.
+
+## Què no ha funcionat
+
+- **RAG amb 1 exemple:** l'encert baixa del 22 % al 16 %. Un model de 0,8B es distreu amb l'exemple.
+- **Raonar 35 s:** hi ha problemes que arriben als 54 s, massa a prop del límit. Ho vam baixar a 20 s.
+- **Fine-tuning:** no ha estat viable dins del temps de la datathon. La placa no pot entrenar, i els 50 problemes de pràctica són massa pocs. Els hem fet servir només com a test.
+- **Una versió per a infants cecs amb veu:** la vam descartar.
+
+## Equip
+
+*Pendent: noms dels 4 membres.* (P1 placa · P2 dades i precàlcul · P3 tutor i `predict.py` · P4 app web, matriu LED i pitch)
+
+Llicència: [MIT](LICENSE), només per al codi.
+
+---
+
+# Datathon FME 2026: Qualcomm challenge (guia de l'organització)
 
 <img width="1526" height="927" alt="UPC-datathon" src="https://github.com/user-attachments/assets/daa7be34-b91a-4703-9581-7b5142f75d91" />
 
